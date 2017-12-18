@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<project name="RestServiceAPI" default="build-module" basedir=".">
+
+	
+	<property name="wildfly.home" 		value="C:/appserver/wildfly-8.1.0.Final" />
+	<property name="wildfly.server" 	value="${wildfly.home}/standalone" />
+	<property name="module.name" 		value="rest-service.war" />
+	<property name="compile.dir" 		value="WebContent/WEB-INF/classes" />
+	<property name="source.dir" 		value="src" />
+	<property name="workspace.dir" 		value=".." />
+	<property name="libs.dir" 			value="./libs" />
+	<property name="output.dir" 		value="./build" />
+	
+	<path id="base.classpath">
+		<fileset dir="${libs.dir}">
+			<include name="*.jar" />
+		</fileset>
+		
+		<fileset dir="${output.dir}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<target name="base-prepare">
+		<mkdir dir="${compile.dir}" />
+	</target>
+
+	<target name="base-clean">
+		<delete dir="${compile.dir}" />
+		<delete file="${output.dir}/${module.name}" />
+	</target>
+
+	<target name="build-module" depends="base-clean,base-prepare">
+
+		<javac srcdir="${source.dir}" destdir="${compile.dir}" debug="on" optimize="off" deprecation="off">
+			<classpath refid="base.classpath" />
+		</javac>
+
+		<copy todir="${compile.dir}">
+			<fileset dir="${source.dir}">
+				<include name="**/*.properties"/>
+			</fileset>
+		</copy>
+
+		<delete file="${output.dir}/${module.name}" />
+		<delete file="${wildfly.server}/deployments/${ear.name}" />  
+
+		<jar jarfile="${output.dir}/${module.name}" manifest="WebContent/META-INF/MANIFEST.MF">
+			<fileset dir="WebContent">
+				<include name="**/*" />
+				<exclude name="**/*.bak" />
+				<exclude name="**/*.$*" />
+				<exclude name="**/*.*~" />
+				<exclude name="**/*.png" />
+				<exclude name="**/Thumbs.db" />
+				<exclude name="**/*.mf" />
+				<exclude name="**/*.MF" />
+			</fileset>
+		</jar>
+		
+		<copy todir="${wildfly.server}/deployments/" file="${output.dir}/${module.name}" />	 
+
+	</target>
+
+</project>
